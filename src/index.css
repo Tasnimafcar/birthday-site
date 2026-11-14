@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: 'Gloock', Georgia, serif;
+  --font-body: 'Hind Siliguri', system-ui, sans-serif;
+}
+
+:root {
+  --night: #0e1030;
+  --plum: #2a1b4d;
+  --gold: #ffd98a;
+  --rose: #ff7aa8;
+  --mist: #e8e4ff;
+  color-scheme: dark;
+}
+
+html, body, #root { min-height: 100%; }
+
+body {
+  margin: 0;
+  background: radial-gradient(120% 90% at 50% 0%, var(--plum), var(--night) 65%) fixed;
+  color: var(--mist);
+  font-family: var(--font-body);
+}
+
+@keyframes twinkle { 0%, 100% { opacity: .12; } 50% { opacity: .55; } }
+@keyframes glow { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+
+.btn {
+  background: var(--gold);
+  color: #2a1b4d;
+  font-weight: 600;
+  border: 0;
+  border-radius: 999px;
+  padding: .8rem 1.8rem;
+  font-size: 1.05rem;
+  cursor: pointer;
+}
+.btn:focus-visible { outline: 3px solid var(--rose); outline-offset: 4px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
