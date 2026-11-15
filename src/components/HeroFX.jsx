@@ -1,15 +1,20 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'motion/react'
+import { T } from '../lib/timing'
 
 // Tara ta kon path e uRbe (screen er fraction)
 const PTS = [
-  [0.5, 0.7], [0.34, 0.64], [0.1, 0.57], [0.3, 0.505],
-  [0.55, 0.495], [0.8, 0.505], [0.95, 0.47], [1.08, 0.28],
+  [0.5, 0.6], [0.37, 0.48], [0.14, 0.36], [0.22, 0.29],
+  [0.46, 0.262], [0.7, 0.262], [0.88, 0.235], [0.78, 0.12], [0.76, 0.1],
 ]
-const D = 4.2 // tara uRar shomoy (second)
-const T_NAME = 3.3 // naam ashar shomoy, ful pORa shuru
+const D = T.D
 const SPARK = ['#ffd98a', '#fff3c4', '#ffffff', '#ffb8d1']
-const PETAL = ['#ffb8d1', '#ff9bbd', '#ffffff', '#ffd6e4', '#ff7aa8']
+const ROSE = [
+  ['#ff4d6d', '#d62f55', '#a8183f'],
+  ['#ff6b8a', '#e04468', '#b02a50'],
+  ['#e63950', '#c01f3c', '#8e1230'],
+  ['#ff8fa3', '#f0627f', '#c23858'],
+]
 
 const cr = (a, b, c, d, t) =>
   0.5 * (2 * b + (-a + c) * t + (2 * a - 5 * b + 4 * c - d) * t * t + (-a + 3 * b - 3 * c + d) * t * t * t)
@@ -62,43 +67,70 @@ export default function HeroFX({ onFinish, skip, style }) {
     let finished = false
     let burstDone = false
 
-    const mkPetal = () => ({
-      x: Math.random() * W,
-      y: -20 - Math.random() * H * 0.25,
-      vy: 18 + Math.random() * 26,
-      sw: Math.random() * 6,
-      swa: 12 + Math.random() * 22,
-      rot: Math.random() * 6.28,
-      vr: (Math.random() - 0.5) * 2.2,
-      s: 5 + Math.random() * 5,
-      flower: Math.random() < 0.28,
-      col: PETAL[Math.floor(Math.random() * PETAL.length)],
-    })
+    const mkPetal = () => {
+      const rose = Math.random() < 0.32
+      return {
+        x: Math.random() * W,
+        y: -20 - Math.random() * H * 0.25,
+        vy: rose ? 45 + Math.random() * 40 : 55 + Math.random() * 55,
+        sw: Math.random() * 6,
+        swa: 12 + Math.random() * 24,
+        rot: Math.random() * 6.28,
+        vr: (Math.random() - 0.5) * 2.4,
+        s: rose ? 9 + Math.random() * 8 : 5 + Math.random() * 5,
+        rose,
+        col: ROSE[Math.floor(Math.random() * ROSE.length)],
+      }
+    }
+
+    const drawRose = (s, cols) => {
+      c.fillStyle = cols[2]
+      for (let k = 0; k < 6; k++) {
+        c.rotate(1.0472)
+        c.beginPath()
+        c.ellipse(0, -s * 0.5, s * 0.5, s * 0.62, 0, 0, 7)
+        c.fill()
+      }
+      c.fillStyle = cols[1]
+      for (let k = 0; k < 5; k++) {
+        c.rotate(1.2566)
+        c.beginPath()
+        c.ellipse(0, -s * 0.34, s * 0.38, s * 0.46, 0, 0, 7)
+        c.fill()
+      }
+      c.fillStyle = cols[0]
+      c.beginPath()
+      c.arc(0, 0, s * 0.3, 0, 7)
+      c.fill()
+      c.strokeStyle = cols[2]
+      c.lineWidth = Math.max(1, s * 0.07)
+      c.beginPath()
+      c.arc(0, 0, s * 0.18, 0.3, 4.6)
+      c.stroke()
+      c.beginPath()
+      c.arc(s * 0.04, 0, s * 0.08, 0.2, 4.2)
+      c.stroke()
+    }
 
     const drawPetal = (p) => {
       c.save()
       c.translate(p.x, p.y)
       c.rotate(p.rot)
-      c.fillStyle = p.col
-      c.globalAlpha = 0.92
-      if (p.flower) {
-        const s = p.s * 1.5
-        for (let k = 0; k < 5; k++) {
-          c.rotate(1.2566)
-          c.beginPath()
-          c.ellipse(0, -s * 0.6, s * 0.38, s * 0.62, 0, 0, 7)
-          c.fill()
-        }
-        c.fillStyle = '#ffd98a'
-        c.beginPath()
-        c.arc(0, 0, s * 0.22, 0, 7)
-        c.fill()
+      c.globalAlpha = 0.95
+      if (p.rose) {
+        drawRose(p.s, p.col)
       } else {
         const s = p.s
+        c.fillStyle = p.col[0]
         c.beginPath()
         c.moveTo(0, -s)
-        c.bezierCurveTo(s * 0.9, -s * 0.5, s * 0.7, s * 0.7, 0, s)
-        c.bezierCurveTo(-s * 0.7, s * 0.7, -s * 0.9, -s * 0.5, 0, -s)
+        c.bezierCurveTo(s * 0.95, -s * 0.5, s * 0.75, s * 0.75, 0, s)
+        c.bezierCurveTo(-s * 0.75, s * 0.75, -s * 0.95, -s * 0.5, 0, -s)
+        c.fill()
+        c.fillStyle = p.col[1]
+        c.globalAlpha = 0.5
+        c.beginPath()
+        c.ellipse(0, s * 0.2, s * 0.35, s * 0.6, 0, 0, 7)
         c.fill()
       }
       c.restore()
@@ -150,14 +182,14 @@ export default function HeroFX({ onFinish, skip, style }) {
         head(x, y)
       }
 
-      if (t >= T_NAME && !burstDone) {
+      if (t >= T.BURST && !burstDone) {
         burstDone = true
         for (let k = 0; k < 70; k++) {
           const a = Math.random() * 6.283
           const sp = 40 + Math.random() * 160
           parts.push({
             x: W / 2,
-            y: H * 0.57,
+            y: H * 0.3,
             vx: Math.cos(a) * sp,
             vy: Math.sin(a) * sp,
             l: 1,
@@ -185,8 +217,8 @@ export default function HeroFX({ onFinish, skip, style }) {
       }
       c.globalAlpha = 1
 
-      if (t >= T_NAME) {
-        if (petals.length < 38 && Math.random() < dt * 9) petals.push(mkPetal())
+      if (t >= T.PETAL) {
+        if (petals.length < 46 && Math.random() < dt * 14) petals.push(mkPetal())
         petals.forEach((p) => {
           p.y += p.vy * dt
           p.x += Math.sin(t * 1.3 + p.sw) * p.swa * dt

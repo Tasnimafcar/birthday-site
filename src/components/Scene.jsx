@@ -1,34 +1,39 @@
+import { useState } from 'react'
 import { motion } from 'motion/react'
 import sceneImg from '../assets/scene.webp'
 
-// Meyer chobi (assets/scene.webp). Edge gulo akasher shathe mishe jay,
-// ar lantern er alo jhilmil kore.
-const MASK =
-  'linear-gradient(to bottom, transparent 0%, #000 22%), linear-gradient(to right, transparent 0%, #000 5%, #000 95%, transparent 100%)'
+// Chobi shob somoy pura screen e. Meye ta bam-majhkhane thake.
+// Jodi nijer chobi (scene.webp) boshao, ei duto ta thik koro:
+const FOCUS_X = 0.44 // chobir kon jayga screen er majhkhane (0 = bam, 1 = dan)
+const LANTERN = { x: 36.3, y: 85 } // lantern kon jaygay (% hishebe), na thakle null koro
 
 export default function Scene() {
+  const [ratio, setRatio] = useState(1789 / 717)
   return (
     <div
-      className="absolute bottom-0 left-1/2 -translate-x-1/2"
-      style={{ height: 'min(78dvh, 135vw)', aspectRatio: '589/717' }}
+      className="absolute top-0"
+      style={{
+        height: '100%',
+        aspectRatio: String(ratio),
+        left: `calc((100vw - 100dvh * ${ratio}) * ${FOCUS_X})`,
+      }}
     >
-      <div
-        className="absolute inset-0"
-        style={{
-          WebkitMaskImage: MASK,
-          maskImage: MASK,
-          WebkitMaskComposite: 'source-in',
-          maskComposite: 'intersect',
-        }}
-      >
-        <img src={sceneImg} alt="" draggable={false} decoding="async" className="h-full w-full" />
+      <img
+        src={sceneImg}
+        alt=""
+        draggable={false}
+        decoding="async"
+        className="h-full w-full"
+        onLoad={(e) => setRatio(e.currentTarget.naturalWidth / e.currentTarget.naturalHeight)}
+      />
+      {LANTERN && (
         <motion.div
           className="pointer-events-none absolute"
           style={{
-            left: '8.5%',
-            top: '85%',
-            width: '36%',
-            height: '30%',
+            left: `${LANTERN.x}%`,
+            top: `${LANTERN.y}%`,
+            width: '9%',
+            height: '28%',
             x: '-50%',
             y: '-50%',
             mixBlendMode: 'screen',
@@ -37,7 +42,7 @@ export default function Scene() {
           animate={{ opacity: [0.55, 1, 0.7, 1, 0.6] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
         />
-      </div>
+      )}
     </div>
   )
 }

@@ -9,36 +9,46 @@ import StarField from './StarField'
 import HeroFX from './HeroFX'
 import HeroText from './HeroText'
 
-// Megh er stor: scroll korle kache ashe, boro hoy, tarpor mishe jay
-const CLOUDS = [
-  { win: [0.08, 0.2, 0.34, 0.46], blobs: [[8, 62, 70, 36], [55, 70, 80, 40], [30, 40, 60, 30], [70, 48, 64, 34]] },
-  { win: [0.22, 0.34, 0.48, 0.6], blobs: [[-5, 50, 80, 40], [40, 58, 90, 42], [72, 36, 60, 30], [20, 72, 70, 34]] },
-  { win: [0.38, 0.5, 0.62, 0.74], blobs: [[10, 44, 75, 38], [52, 52, 85, 40], [78, 66, 64, 32], [25, 28, 60, 30]] },
-]
+// Megh: chad kache ashar shomoy dui pashe soriye jay
+function makeBlobs() {
+  let sd = 7
+  const r = () => {
+    sd = (sd * 16807) % 2147483647
+    return sd / 2147483647
+  }
+  return Array.from({ length: 18 }, () => ({
+    x: 4 + r() * 92,
+    y: 20 + r() * 42,
+    w: 42 + r() * 34,
+    h: 16 + r() * 14,
+    a: 0.55 + r() * 0.4,
+    mv: 70 + r() * 50,
+  }))
+}
+const BLOBS = makeBlobs()
 
-function CloudGroup({ p, win, blobs }) {
-  const opacity = useTransform(p, win, [0, 0.9, 0.9, 0])
-  const scale = useTransform(p, [win[0], win[3]], [1, 3.4])
+function Blob({ p, b }) {
+  const side = b.x < 50 ? -1 : 1
+  const x = useTransform(p, [0.08, 0.62], ['0vw', `${side * b.mv}vw`])
+  const opacity = useTransform(p, [0.05, 0.14, 0.5, 0.66], [0, b.a, b.a, 0])
+  const scale = useTransform(p, [0.08, 0.62], [1, 1.5])
   return (
     <motion.div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0"
-      style={{ opacity, scale, transformOrigin: '50% 40%' }}
-    >
-      {blobs.map((b, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{
-            left: `${b[0]}%`,
-            top: `${b[1]}%`,
-            width: `${b[2]}vmin`,
-            height: `${b[3]}vmin`,
-            background: 'radial-gradient(closest-side, rgba(175,186,235,.34), rgba(175,186,235,0))',
-          }}
-        />
-      ))}
-    </motion.div>
+      className="pointer-events-none absolute"
+      style={{
+        left: `${b.x}%`,
+        top: `${b.y}%`,
+        width: `${b.w}vmin`,
+        height: `${b.h}vmin`,
+        marginLeft: `${-b.w / 2}vmin`,
+        marginTop: `${-b.h / 2}vmin`,
+        x,
+        opacity,
+        scale,
+        background: 'radial-gradient(closest-side, rgba(190,200,245,.4), rgba(190,200,245,0))',
+      }}
+    />
   )
 }
 
@@ -52,22 +62,27 @@ export default function Journey({ onDone }) {
 
   const { scrollYProgress: p } = useScroll({ target: box, offset: ['start start', 'end end'] })
 
+  // Chad shuru te choto ar dure, shesh e pura screen bhore dey
   const kmax = useMemo(() => {
     const w = window.innerWidth
     const h = window.innerHeight
-    return (2.6 * Math.max(w, h)) / (0.3 * Math.min(w, h))
+    const d0 = Math.max(52, Math.min(150, 0.12 * Math.min(w, h)))
+    return (2.1 * Math.hypot(w / 2, h / 2)) / d0
   }, [])
 
-  const scale = useTransform(p, (v) => Math.exp(Math.log(kmax) * Math.pow(Math.max(0, v), 1.25)))
-  const top = useTransform(p, (v) => `${27 + 23 * v}%`)
-  const groundY = useTransform(p, [0, 0.22], ['0%', '112%'])
-  const groundOp = useTransform(p, [0.15, 0.22], [1, 0])
-  const fxOp = useTransform(p, [0, 0.18], [1, 0])
-  const titleOp = useTransform(p, [0, 0.08], [1, 0])
-  const hintOp = useTransform(p, [0, 0.05], [1, 0])
-  const t2Op = useTransform(p, [0.22, 0.3, 0.42, 0.5], [0, 1, 1, 0])
-  const t3Op = useTransform(p, [0.62, 0.7, 0.82, 0.9], [0, 1, 1, 0])
-  const veilOp = useTransform(p, [0.9, 1], [0, 1])
+  const moonScale = useTransform(p, (v) => Math.exp(Math.log(kmax) * Math.pow(v, 1.15)))
+  const moonLeft = useTransform(p, [0, 0.85], ['76%', '50%'])
+  const moonTop = useTransform(p, [0, 0.85], ['10%', '50%'])
+  const sceneScale = useTransform(p, [0, 1], [1, 1.35])
+  const sceneOp = useTransform(p, [0.6, 0.9], [1, 0])
+  const fxOp = useTransform(p, [0, 0.2], [1, 0])
+  const titleOp = useTransform(p, [0, 0.07], [1, 0])
+  const hintOp = useTransform(p, [0, 0.04], [1, 0])
+  const veilOp = useTransform(p, [0.93, 1], [0, 1])
+  const starMask = useTransform(p, (v) => {
+    const a = 42 + 70 * Math.min(1, v / 0.4)
+    return `linear-gradient(to bottom,#000 0%,#000 ${a - 12}%,transparent ${a}%)`
+  })
 
   useMotionValueEvent(p, 'change', (v) => {
     warp.p = v
@@ -99,7 +114,7 @@ export default function Journey({ onDone }) {
     }
   }, [])
 
-  // Lekha ashar age scroll lock
+  // Animation shesh na hoa porjonto scroll lock
   useEffect(() => {
     const l = lenisRef.current
     if (!introDone) {
@@ -112,19 +127,37 @@ export default function Journey({ onDone }) {
   }, [introDone])
 
   return (
-    <div ref={box} className="relative" style={{ height: '600vh' }}>
-      <div className="sticky top-0 h-dvh overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="absolute inset-0"
-          style={{ background: 'radial-gradient(60% 45% at 50% 25%, rgba(120,140,230,.22), transparent 70%)' }}
-        />
-
-        {/* Chad */}
+    <div ref={box} className="relative" style={{ height: '560vh' }}>
+      <div className="sticky top-0 h-dvh overflow-hidden" style={{ background: '#070c1b' }}>
+        {/* Chobi: pura screen. Meye jayga thekei thake, chad ta kache ashe */}
         <motion.div
           aria-hidden="true"
-          className="absolute left-1/2"
-          style={{ top, x: '-50%', y: '-50%', scale, width: '30vmin', height: '30vmin', willChange: 'transform' }}
+          className="pointer-events-none absolute inset-0"
+          style={{ scale: sceneScale, opacity: sceneOp, transformOrigin: '76% 10%' }}
+        >
+          <Scene />
+        </motion.div>
+
+        {/* Chobir akashe jolojole tara (meyer opor e na) */}
+        <StarField
+          className="pointer-events-none absolute inset-0 h-full w-full"
+          style={{ WebkitMaskImage: starMask, maskImage: starMask }}
+        />
+
+        {/* Chad: dure, choto, upore dane */}
+        <motion.div
+          aria-hidden="true"
+          className="absolute"
+          style={{
+            left: moonLeft,
+            top: moonTop,
+            x: '-50%',
+            y: '-50%',
+            scale: moonScale,
+            width: 'clamp(52px, 12vmin, 150px)',
+            height: 'clamp(52px, 12vmin, 150px)',
+            willChange: 'transform',
+          }}
         >
           <div
             className="absolute rounded-full"
@@ -141,66 +174,44 @@ export default function Journey({ onDone }) {
             draggable={false}
             decoding="async"
             className="absolute inset-0 h-full w-full rounded-full"
-            style={{ filter: 'drop-shadow(0 0 2.5vmin rgba(235,240,255,.35))' }}
+            style={{ filter: 'drop-shadow(0 0 1.5vmin rgba(235,240,255,.35))' }}
           />
         </motion.div>
 
-        {CLOUDS.map((c, i) => (
-          <CloudGroup key={i} p={p} win={c.win} blobs={c.blobs} />
+        {BLOBS.map((b, i) => (
+          <Blob key={i} p={p} b={b} />
         ))}
 
-        {/* Meye, balcony, gach, lantern */}
-        <motion.div aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ y: groundY, opacity: groundOp }}>
-          <Scene />
-        </motion.div>
-
-        {/* Chobi er akashe jolojole tara (meyer opor e na) */}
-        <StarField
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          style={{
-            WebkitMaskImage: 'linear-gradient(to bottom,#000 0%,#000 50%,transparent 64%)',
-            maskImage: 'linear-gradient(to bottom,#000 0%,#000 50%,transparent 64%)',
-          }}
-        />
-
-        {/* Tara uRe jay, lekha ashe, ful pORe */}
+        {/* Tara uRe jay, lekha ashe, gulap pORe */}
         <HeroFX skip={reduce} style={{ opacity: fxOp }} onFinish={() => setIntroDone(true)} />
 
-        <motion.div className="absolute inset-x-0" style={{ top: 'max(40%, calc(27% + 17vmin))', opacity: titleOp }}>
+        <motion.div className="absolute inset-x-0" style={{ top: '15%', opacity: titleOp }}>
           <HeroText name={CONFIG.name} />
         </motion.div>
 
-        <motion.div className="absolute inset-x-0 text-center" style={{ bottom: '4%', opacity: hintOp, color: 'var(--gold)' }}>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: introDone ? 1 : 0 }} transition={{ duration: 0.8 }}>
-            <p className="text-lg">Nice kore scroll koro</p>
-            <motion.svg
-              aria-hidden="true"
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mx-auto mt-1"
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 1.6 }}
+        {/* Scroll hint */}
+        <motion.div className="pointer-events-none absolute inset-x-0 bottom-0" style={{ opacity: hintOp }}>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: introDone ? 1 : 0 }}
+            transition={{ duration: 0.9 }}
+            className="flex flex-col items-center gap-2 pb-5 pt-14"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,.5), transparent)', color: 'rgba(240,238,255,.92)' }}
+          >
+            <span style={{ fontSize: 11, letterSpacing: '0.38em', textTransform: 'uppercase', fontWeight: 600, paddingLeft: '0.38em' }}>
+              Scroll down
+            </span>
+            <div
+              className="relative"
+              style={{ width: 22, height: 36, borderRadius: 12, border: '1.5px solid rgba(240,238,255,.75)' }}
             >
-              <path d="M6 9l6 6 6-6" />
-            </motion.svg>
+              <motion.span
+                style={{ position: 'absolute', left: '50%', top: 6, width: 3, height: 7, borderRadius: 2, background: '#fff', x: '-50%' }}
+                animate={{ y: [0, 12, 0], opacity: [1, 0.2, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            </div>
           </motion.div>
-        </motion.div>
-
-        <motion.div className="absolute inset-x-0 px-6 text-center" style={{ top: '72%', opacity: t2Op }}>
-          <p className="font-display mx-auto max-w-md text-3xl leading-snug sm:text-4xl">Chad ta kache ashche...</p>
-        </motion.div>
-
-        <motion.div
-          className="absolute inset-x-0 px-6 text-center"
-          style={{ top: '48%', y: '-50%', opacity: t3Op, color: '#fff', textShadow: '0 2px 14px rgba(0,0,0,.8)' }}
-        >
-          <p className="font-display mx-auto max-w-md text-3xl leading-snug sm:text-5xl">Prai pouchhe gelam</p>
         </motion.div>
 
         <motion.div className="pointer-events-none absolute inset-0" style={{ opacity: veilOp, background: '#a9a9ad' }} />

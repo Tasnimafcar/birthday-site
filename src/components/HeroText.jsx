@@ -1,48 +1,51 @@
-import { motion } from 'motion/react'
+import { useEffect } from 'react'
+import { animate, motion, useMotionValue, useTransform } from 'motion/react'
+import { T } from '../lib/timing'
 
-const LINE = 'Happy Birthday'
+// Kolom diye lekhar moto: bam theke dane dhire dhire ashe
+function Wipe({ at, dur, className, style, children }) {
+  const v = useMotionValue(-12)
+  const mask = useTransform(v, (x) => `linear-gradient(90deg,#000 ${x - 10}%,transparent ${x + 2}%)`)
+  useEffect(() => {
+    const a = animate(v, 112, { duration: dur, delay: at, ease: 'easeInOut' })
+    return () => a.stop()
+  }, [v, at, dur])
+  return (
+    <motion.div className={className} style={{ ...style, WebkitMaskImage: mask, maskImage: mask }}>
+      {children}
+    </motion.div>
+  )
+}
 
-// Tara jokhon uRe jay, tar sathe sathe lekha ashe
 export default function HeroText({ name }) {
   return (
-    <div className="px-4 text-center">
-      <div
-        aria-label={LINE}
-        className="font-display text-4xl sm:text-6xl"
-        style={{ color: '#fff7e0', textShadow: '0 0 18px rgba(255,217,138,.8)' }}
+    <motion.div
+      className="px-3 text-center"
+      animate={{ y: [0, -5, 0] }}
+      transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 4.5 }}
+    >
+      <Wipe
+        at={T.LINE1}
+        dur={T.LINE1_DUR}
+        className="font-script px-4 text-5xl leading-[1.2] sm:text-6xl"
+        style={{ color: '#fff1d6', textShadow: '0 0 14px rgba(255,214,150,.65), 0 0 40px rgba(255,170,110,.35)' }}
       >
-        {[...LINE].map((ch, i) => (
-          <motion.span
-            key={i}
-            aria-hidden="true"
-            initial={{ opacity: 0, y: 14, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            transition={{ delay: 1.7 + i * 0.09, duration: 0.7 }}
-            style={{ display: 'inline-block', whiteSpace: 'pre' }}
-          >
-            {ch === ' ' ? '\u00A0' : ch}
-          </motion.span>
-        ))}
-      </div>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.6, filter: 'blur(10px)' }}
-        animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-        transition={{ delay: 3.3, type: 'spring', stiffness: 120, damping: 12 }}
-        className="mt-2"
-      >
+        Happy Birthday
+      </Wipe>
+      <Wipe at={T.NAME_AT} dur={T.NAME_DUR} className="px-4">
         <div
-          className="font-display text-6xl sm:text-8xl"
+          className="font-script text-7xl leading-[1.1] sm:text-8xl"
           style={{
-            background: 'linear-gradient(180deg,#ffffff,#ffd0e1 60%,#ff8fb5)',
+            background: 'linear-gradient(180deg,#ffffff 0%,#ffe3ec 45%,#ffb3c8 100%)',
             WebkitBackgroundClip: 'text',
             backgroundClip: 'text',
             color: 'transparent',
-            filter: 'drop-shadow(0 0 16px rgba(255,122,168,.7))',
+            filter: 'drop-shadow(0 0 14px rgba(255,150,180,.65))',
           }}
         >
           {name}
         </div>
-      </motion.div>
-    </div>
+      </Wipe>
+    </motion.div>
   )
 }

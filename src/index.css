@@ -3,11 +3,12 @@
 @theme {
   --font-display: 'Gloock', Georgia, serif;
   --font-body: 'Hind Siliguri', system-ui, sans-serif;
+  --font-script: 'Great Vibes', cursive;
 }
 
 :root {
-  --night: #0e1030;
-  --plum: #2a1b4d;
+  --night: #060b1a;
+  --plum: #0f1a36;
   --gold: #ffd98a;
   --rose: #ff7aa8;
   --mist: #e8e4ff;
