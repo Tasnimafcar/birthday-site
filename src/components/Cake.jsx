@@ -267,7 +267,7 @@ export default function Cake({ onDone }) {
   }
 
   return (
-    <section className="flex min-h-screen flex-col items-center justify-center px-5 py-6 text-center">
+    <section className="flex min-h-dvh flex-col items-center justify-center px-5 py-6 text-center">
       <h2 className="font-display text-3xl">{out ? 'Shubho janmodin!' : 'Ichchha koro, tarpor fu dao'}</h2>
       <div className="mt-4" style={{ width: 'min(92vw,420px)', aspectRatio: '420/440' }}>
         <canvas

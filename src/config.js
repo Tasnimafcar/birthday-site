@@ -1,7 +1,7 @@
 // Ekhane nijer moto shob bodlao
 export const CONFIG = {
-  name: 'Priya',
-  nick: 'Jaan',
+  name: 'Nahida',
+  nick: 'Nahida',
   age: 21,
   from: 'Tomar Ami',
   memories: [

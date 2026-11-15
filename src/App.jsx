@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
-import StarField from './components/StarField'
+import moonImg from './assets/moon.webp'
 import Journey from './components/Journey'
-import Hunt from './components/Hunt'
 import Cake from './components/Cake'
 import Letter from './components/Letter'
 
@@ -17,7 +16,17 @@ export default function App() {
 
   return (
     <>
-      <StarField />
+      {stage !== 'journey' && (
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 z-[1]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(14,16,48,.62),rgba(14,16,48,.88)),url("${moonImg}")`,
+            backgroundSize: 'cover,230%',
+            backgroundPosition: 'center,38% 55%',
+          }}
+        />
+      )}
       <canvas id="fx" aria-hidden="true" className="pointer-events-none fixed inset-0 z-30 h-full w-full" />
       {flashKey > 0 && (
         <motion.div
@@ -30,8 +39,7 @@ export default function App() {
         />
       )}
       <main className="relative z-10">
-        {stage === 'journey' && <Journey onDone={() => go('hunt', true)} />}
-        {stage === 'hunt' && <Hunt onDone={() => go('cake')} />}
+        {stage === 'journey' && <Journey onDone={() => go('cake', true)} />}
         {stage === 'cake' && <Cake onDone={() => go('letter')} />}
         {stage === 'letter' && <Letter onAgain={() => go('journey')} />}
       </main>

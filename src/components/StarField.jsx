@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { warp } from '../lib/warp'
 
-export default function StarField() {
+export default function StarField({ className, style }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -12,10 +12,10 @@ export default function StarField() {
     const resize = () => {
       W = c.width = window.innerWidth
       H = c.height = window.innerHeight
-      S = Array.from({ length: Math.min(230, (W * H) / 5000) | 0 }, () => ({
+      S = Array.from({ length: Math.min(340, (W * H) / 3600) | 0 }, () => ({
         x: Math.random() * W,
         y: Math.random() * H,
-        r: Math.random() * 1.4 + 0.3,
+        r: Math.random() * 1.4 + 0.3 + (Math.random() < 0.06 ? 1.1 : 0),
         p: Math.random() * 6,
         z: Math.random() * 0.9 + 0.1,
       }))
@@ -72,5 +72,5 @@ export default function StarField() {
     }
   }, [])
 
-  return <canvas ref={ref} aria-hidden="true" className="fixed inset-0 z-0 h-full w-full" />
+  return <canvas ref={ref} aria-hidden="true" className={className || 'fixed inset-0 z-0 h-full w-full'} style={style} />
 }

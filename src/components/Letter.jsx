@@ -20,7 +20,7 @@ export default function Letter({ onAgain }) {
   }, [i, full])
 
   return (
-    <section className="flex min-h-screen flex-col items-center justify-center px-6 py-10">
+    <section className="flex min-h-dvh flex-col items-center justify-center px-6 py-10">
       <div
         className="w-full max-w-md rounded-2xl p-7"
         style={{ background: 'rgba(232,228,255,.08)', border: '1px solid rgba(255,217,138,.4)' }}
