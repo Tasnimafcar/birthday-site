@@ -2,7 +2,7 @@
 export const CONFIG = {
   name: 'Nahida',
   nick: 'Nahida',
-  age: 21,
+  age: 18,
   from: 'Tomar Ami',
   memories: [
     'Prothom jedin tomar sathe kotha hoyechilo, ami bujhini ekta shuru hocche.',

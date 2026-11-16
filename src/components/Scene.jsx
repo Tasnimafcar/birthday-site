@@ -3,12 +3,12 @@ import { motion } from 'motion/react'
 import sceneImg from '../assets/scene.webp'
 
 // Chobi shob somoy pura screen e. Meye ta bam-majhkhane thake.
-// Jodi nijer chobi (scene.webp) boshao, ei duto ta thik koro:
+// Nijer chobi (scene.webp) boshale ei duto bodlate hobe:
 const FOCUS_X = 0.44 // chobir kon jayga screen er majhkhane (0 = bam, 1 = dan)
-const LANTERN = { x: 36.3, y: 85 } // lantern kon jaygay (% hishebe), na thakle null koro
+const LANTERN = { x: 35.7, y: 85 } // lantern kon jaygay (%), na thakle null koro
 
 export default function Scene() {
-  const [ratio, setRatio] = useState(1789 / 717)
+  const [ratio, setRatio] = useState(1709 / 717)
   return (
     <div
       className="absolute top-0"

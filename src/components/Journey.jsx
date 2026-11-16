@@ -70,11 +70,12 @@ export default function Journey({ onDone }) {
     return (2.1 * Math.hypot(w / 2, h / 2)) / d0
   }, [])
 
+  // Camera akasher dike zoom kore: chad nijer jaygay thake, chobi ta zoom hoye bam-niche diye soriye jay
   const moonScale = useTransform(p, (v) => Math.exp(Math.log(kmax) * Math.pow(v, 1.15)))
-  const moonLeft = useTransform(p, [0, 0.85], ['76%', '50%'])
-  const moonTop = useTransform(p, [0, 0.85], ['10%', '50%'])
-  const sceneScale = useTransform(p, [0, 1], [1, 1.35])
-  const sceneOp = useTransform(p, [0.6, 0.9], [1, 0])
+  const moonLeft = useTransform(p, [0, 0.55, 1], ['76%', '76%', '50%'])
+  const moonTop = useTransform(p, [0, 0.55, 1], ['10%', '10%', '50%'])
+  const sceneScale = useTransform(p, (v) => 1 + 4 * Math.pow(v, 1.2))
+  const sceneOp = useTransform(p, [0.45, 0.8], [1, 0])
   const fxOp = useTransform(p, [0, 0.2], [1, 0])
   const titleOp = useTransform(p, [0, 0.07], [1, 0])
   const hintOp = useTransform(p, [0, 0.04], [1, 0])
@@ -96,6 +97,8 @@ export default function Journey({ onDone }) {
   useEffect(() => {
     window.scrollTo(0, 0)
     warp.p = 0
+    warp.cx = 0.76
+    warp.cy = 0.1
     const lenis = new Lenis({ lerp: 0.08 })
     lenisRef.current = lenis
     let raf
@@ -110,6 +113,8 @@ export default function Journey({ onDone }) {
       lenisRef.current = null
       document.documentElement.style.overflow = ''
       warp.p = 0
+      warp.cx = 0.5
+      warp.cy = 0.4
       clearTimeout(timer.current)
     }
   }, [])
@@ -129,7 +134,7 @@ export default function Journey({ onDone }) {
   return (
     <div ref={box} className="relative" style={{ height: '560vh' }}>
       <div className="sticky top-0 h-dvh overflow-hidden" style={{ background: '#070c1b' }}>
-        {/* Chobi: pura screen. Meye jayga thekei thake, chad ta kache ashe */}
+        {/* Chobi: pura screen. Scroll korle camera chader dike zoom kore */}
         <motion.div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0"

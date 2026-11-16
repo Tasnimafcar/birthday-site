@@ -34,8 +34,8 @@ export default function StarField({ className, style }) {
       const k = 1 + SP * SP * 5
       S.forEach((s) => {
         const f = 1 + (k - 1) * s.z
-        const px = W / 2 + (s.x - W / 2) * f
-        const py = H * 0.4 + (s.y - H * 0.4) * f
+        const px = warp.cx * W + (s.x - warp.cx * W) * f
+        const py = warp.cy * H + (s.y - warp.cy * H) * f
         if (px < 0 || px > W || py < 0 || py > H) return
         x.globalAlpha = Math.max(
           0,
